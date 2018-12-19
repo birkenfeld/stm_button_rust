@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# This is an alternate way to flash and run the project if openocd + gdb
+# is not working for you.  Needs the stlink utility suite from here:
+# https://github.com/texane/stlink
+
+arm-none-eabi-objcopy -Obinary "$1" "$1.bin"
+./st-flash write "$1.bin" 0x08000000
