@@ -1,0 +1,33 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP Battery
+D Multiple-cell battery
+K batt voltage-source cell
+F ~
+$ENDCMP
+#
+$CMP PAM8302AAD
+D 2.5W Filterless Class-D Mono Audio Amplifier, SOIC-8
+K audio amplifier class d
+F https://www.diodes.com/assets/Datasheets/PAM8302A.pdf
+$ENDCMP
+#
+$CMP PAM8302AAS
+D 2.5W Filterless Class-D Mono Audio Amplifier, MSOP-8
+K audio amplifier class d
+F https://www.diodes.com/assets/Datasheets/PAM8302A.pdf
+$ENDCMP
+#
+$CMP PAM8302AAY
+D 2.5W Filterless Class-D Mono Audio Amplifier, DFN-8
+K audio amplifier class d
+F https://www.diodes.com/assets/Datasheets/PAM8302A.pdf
+$ENDCMP
+#
+$CMP uSD_SPI
+D Micro SD Card for SPI mode
+K connector SD microsd
+F http://katalog.we-online.de/em/datasheet/693072010801.pdf
+$ENDCMP
+#
+#End Doc Library

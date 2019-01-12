@@ -5,3 +5,7 @@ Cargo.lock
 target/
 examples/
 __pycache__/
+*.kicad_pcb-bak
+*.net
+*.bak
+*.bck
