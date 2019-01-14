@@ -6,6 +6,12 @@ K batt voltage-source cell
 F ~
 $ENDCMP
 #
+$CMP DMC2038LVT
+D 3A Id, 20V Vds, 0.4-1V  Vgs, N/P, TSOT26
+K Dual N-Channel P-Channel MOSFET
+F https://www.mouser.de/datasheet/2/115/DMC2038LVT-82505.pdf
+$ENDCMP
+#
 $CMP PAM8302AAD
 D 2.5W Filterless Class-D Mono Audio Amplifier, SOIC-8
 K audio amplifier class d
