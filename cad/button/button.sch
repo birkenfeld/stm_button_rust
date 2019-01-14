@@ -287,11 +287,11 @@ Text GLabel 2500 6400 0    50   Input ~ 0
 SD_MOSI
 Text GLabel 3600 6600 2    50   Input ~ 0
 SD_CS
-Text GLabel 3600 5500 2    50   Input ~ 0
+Text GLabel 3600 5600 2    50   Input ~ 0
 SPK_IN+
-Text GLabel 3600 6300 2    50   Input ~ 0
+Text GLabel 3600 5700 2    50   Input ~ 0
 SPK_SD
-Text GLabel 5750 1900 0    50   Input ~ 0
+Text GLabel 5750 2100 0    50   Input ~ 0
 SPK_IN+
 Text GLabel 5900 4450 0    50   Input ~ 0
 SD_CS
@@ -637,9 +637,9 @@ Wire Wire Line
 	7300 2700 7300 2800
 Wire Wire Line
 	3000 6850 3000 7050
-Text GLabel 3600 5600 2    50   Input ~ 0
+Text GLabel 3600 5500 2    50   Input ~ 0
 SPK_IN-
-Text GLabel 5750 2300 0    50   Input ~ 0
+Text GLabel 5750 2500 0    50   Input ~ 0
 SPK_IN-
 $Comp
 L Device:C_Small C10
@@ -765,13 +765,13 @@ Wire Wire Line
 $Comp
 L Device:R_POT RV1
 U 1 1 5C3FAFD1
-P 5850 2100
-F 0 "RV1" H 5780 2054 50  0000 R CNN
-F 1 "R_POT" H 5780 2145 50  0000 R CNN
-F 2 "Potentiometers:Potentiometer_Trimmer-EVM3E" H 5850 2100 50  0001 C CNN
-F 3 "~" H 5850 2100 50  0001 C CNN
-	1    5850 2100
-	1    0    0    1   
+P 5850 2300
+F 0 "RV1" H 5780 2346 50  0000 R CNN
+F 1 "R_POT" H 5780 2255 50  0000 R CNN
+F 2 "Potentiometers:Potentiometer_Trimmer-EVM3E" H 5850 2300 50  0001 C CNN
+F 3 "~" H 5850 2300 50  0001 C CNN
+	1    5850 2300
+	1    0    0    -1  
 $EndComp
 $Comp
 L Device:C_Small C7
@@ -795,8 +795,6 @@ F 3 "~" H 6200 2300 50  0001 C CNN
 	1    6200 2300
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	6000 2100 6100 2100
 $Comp
 L Device:R_Small R6
 U 1 1 5C40041B
@@ -819,17 +817,6 @@ F 3 "~" H 6500 2300 50  0001 C CNN
 	1    6500 2300
 	0    1    1    0   
 $EndComp
-Wire Wire Line
-	5750 2300 5850 2300
-Wire Wire Line
-	5850 2250 5850 2300
-Connection ~ 5850 2300
-Wire Wire Line
-	5850 2300 6100 2300
-Wire Wire Line
-	5750 1900 5850 1900
-Wire Wire Line
-	5850 1900 5850 1950
 Wire Wire Line
 	6650 2750 6800 2750
 Wire Wire Line
@@ -903,5 +890,18 @@ Wire Wire Line
 	7950 2300 8300 2300
 Text Label 4300 2450 1    50   ~ 0
 GATE_P
-NoConn ~ 3600 5700
+NoConn ~ 3600 6300
+Wire Wire Line
+	6000 2300 6100 2300
+Wire Wire Line
+	5750 2500 5850 2500
+Wire Wire Line
+	5850 2500 5850 2450
+Wire Wire Line
+	5850 2150 5850 2100
+Wire Wire Line
+	5850 2100 5750 2100
+Wire Wire Line
+	5850 2100 6100 2100
+Connection ~ 5850 2100
 $EndSCHEMATC
