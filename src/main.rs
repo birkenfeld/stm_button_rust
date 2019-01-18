@@ -76,8 +76,11 @@ impl sd::TimeSource for Clock {
     }
 }
 
-static mut AUDIO1: [u8; 1024] = [0; 1024];
-static mut AUDIO2: [u8; 1024] = [0; 1024];
+const BUFSIZE: usize = 2048;
+static mut AUDIO1: [u8; BUFSIZE] = [0; BUFSIZE];
+static mut AUDIO2: [u8; BUFSIZE] = [0; BUFSIZE];
+
+static mut CONFIG: [u8; 512] = [0; 512];
 
 #[cortex_m_rt::entry]
 fn main() -> ! {
@@ -124,9 +127,9 @@ fn main() -> ! {
     write!(DMA1.cselr: c2s = 0b1001);
     write!(DMA1.ccr2: circ = true, dir = true, minc = true, pl = 0b11, // very high
            msize = 0, psize = 0);
-    write!(DMA1.cndtr2: ndt = 1024);
+    write!(DMA1.cndtr2: ndt = BUFSIZE as u16);
 
-    write!(TIM6.arr: arr = 191*8);
+    write!(TIM6.arr: arr = 180*4); // for 22050 kHz
     write!(TIM6.egr: ug = true);
     write!(TIM6.cr2: mms = 0b010); // trigger on update
     write!(TIM6.dier: ude = true);
@@ -134,11 +137,20 @@ fn main() -> ! {
     // Initialize SD card
     let mut cont = sd::Controller::new(sd::SdMmcSpi::new(SPI, CS), Clock);
     cont.device().init().unwrap();
+    write!(GPIOA.bsrr: bs5 = true); // turn on LED
+
     // Speed up SPI to maximum (8 MHz)
     modif!(SPI1.cr1: br = 0b000);
     let vol = cont.get_volume(sd::VolumeIdx(0)).unwrap();
     let root = cont.open_root_dir(&vol).unwrap();
-    let mut fd = cont.open_file_in_dir(&vol, &root, "audio.raw", sd::Mode::ReadOnly).unwrap();
+
+    let cfg = unsafe { &mut CONFIG };
+    let mut fd = cont.open_file_in_dir(&vol, &root, "config.txt", sd::Mode::ReadOnly).unwrap();
+    let n = cont.read(&vol, &mut fd, cfg).unwrap();
+    let afile = core::str::from_utf8(&cfg[..n]).unwrap().trim();
+    drop(fd);
+
+    let mut fd = cont.open_file_in_dir(&vol, &root, afile, sd::Mode::ReadOnly).unwrap();
 
     'outer: loop {
         // Clear output
@@ -159,27 +171,27 @@ fn main() -> ! {
         modif!(DMA1.ccr2: en = true);
 
         loop {
-            // Clear DMA transfer flags
-            write!(DMA1.ifcr: ctcif2 = true, chtif2 = true, cgif2 = true, cteif2 = true);
-
+            swap(&mut ptr1, &mut ptr2);
             // Read next block into buffer
-            if cont.read(&vol, &mut fd, ptr2).unwrap() == 0 {
+            if cont.read(&vol, &mut fd, ptr1).unwrap() == 0 {
                 // On end of file, deactivate DMA
                 write!(TIM6.cr1: cen = false);
                 modif!(DMA1.ccr2: en = false);
                 break;
             }
-            write!(DMA1.cmar2: ma = ptr2.as_ptr() as u32);
-            swap(&mut ptr1, &mut ptr2);
 
-            // Wait for half-done flag
-            while !readb!(DMA1.isr: htif2) {}
+            // Wait for transfer complete flag
+            while !readb!(DMA1.isr: tcif2) {}
+            write!(DMA1.cmar2: ma = ptr1.as_ptr() as u32);
+            // Clear DMA transfer flags
+            write!(DMA1.ifcr: ctcif2 = true, chtif2 = true, cgif2 = true, cteif2 = true);
         }
     }
 }
 
 #[panic_handler]
 fn panicking(_: &core::panic::PanicInfo) -> ! {
+    write!(GPIOA.bsrr: br5 = true); // turn off LED
     let _ = sh::hprintln!("panic!");
     loop {}
 }
