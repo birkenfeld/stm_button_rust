@@ -26,6 +26,13 @@ macro_rules! read {
 }
 
 #[macro_export]
+macro_rules! readr {
+    ($p:ident . $r:ident) => {
+        unsafe { (*stm::$p::ptr()).$r.read() }
+    };
+}
+
+#[macro_export]
 macro_rules! readb {
     ($p:ident . $r:ident : $bit:ident) => {
         unsafe { (*stm::$p::ptr()).$r.read().$bit().bit_is_set() }
