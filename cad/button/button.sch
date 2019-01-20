@@ -721,8 +721,8 @@ L Device:R_POT RV1
 U 1 1 5C3FAFD1
 P 5900 2350
 F 0 "RV1" H 5830 2396 50  0000 R CNN
-F 1 "R_POT" H 5830 2305 50  0000 R CNN
-F 2 "Potentiometers:Potentiometer_Trimmer-EVM3E" H 5900 2350 50  0001 C CNN
+F 1 "10k" H 5830 2305 50  0000 R CNN
+F 2 "custom:Potentiometer_Trimmer-EVM3Y" H 5900 2350 50  0001 C CNN
 F 3 "~" H 5900 2350 50  0001 C CNN
 	1    5900 2350
 	1    0    0    -1  
