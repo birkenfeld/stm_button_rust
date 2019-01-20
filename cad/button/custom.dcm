@@ -1,5 +1,11 @@
 EESchema-DOCLIB  Version 2.0
 #
+$CMP Ali_uSD_SPI
+D Micro SD Card for SPI mode
+K connector SD microsd
+F http://katalog.we-online.de/em/datasheet/693072010801.pdf
+$ENDCMP
+#
 $CMP Battery
 D Multiple-cell battery
 K batt voltage-source cell

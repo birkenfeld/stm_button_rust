@@ -268,17 +268,6 @@ F 3 "" H 2050 5600 50  0001 C CNN
 $EndComp
 Text Label 2200 5300 0    50   ~ 0
 BOOT0
-$Comp
-L custom:uSD_SPI J1
-U 1 1 5C3DB7D2
-P 6800 4600
-F 0 "J1" H 6750 5317 50  0000 C CNN
-F 1 "uSD_SPI" H 6750 5226 50  0000 C CNN
-F 2 "custom:PJRC_uSD_Adapter" H 7950 4900 50  0001 C CNN
-F 3 "http://katalog.we-online.de/em/datasheet/693072010801.pdf" H 6800 4600 50  0001 C CNN
-	1    6800 4600
-	1    0    0    -1  
-$EndComp
 Text GLabel 2450 6200 0    50   Output ~ 0
 SD_SCK
 Text GLabel 2450 6300 0    50   Input ~ 0
@@ -929,4 +918,15 @@ Wire Wire Line
 	3650 5500 3600 5500
 Wire Wire Line
 	7700 1650 7850 1650
+$Comp
+L custom:Ali_uSD_SPI J1
+U 1 1 5C452F0C
+P 6800 4600
+F 0 "J1" H 7150 5300 50  0000 L CNN
+F 1 "Ali_uSD_SPI" H 7150 5200 50  0000 L CNN
+F 2 "custom:Ali_uSD_Adapter" H 7950 4850 50  0001 C CNN
+F 3 "http://katalog.we-online.de/em/datasheet/693072010801.pdf" H 6800 4550 50  0001 C CNN
+	1    6800 4600
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
