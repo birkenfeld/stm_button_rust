@@ -167,6 +167,7 @@ fn main() -> ! {
         // Wait for button press
         while readb!(GPIOC.idr: id13) {}
 
+        // Start DMA and timer
         write!(TIM6.cr1: cen = true);
         modif!(DMA1.ccr2: en = true);
 
