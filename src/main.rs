@@ -1,13 +1,12 @@
 #![no_main]
 #![no_std]
 
+use core::convert::Infallible;
 use core::mem::swap;
 use stm32l0::stm32l0x3 as stm;
-// use stm32l0::stm32l0x3::interrupt;
 use cortex_m_rt::ExceptionFrame;
 use embedded_hal as hal;
 use embedded_sdmmc as sd;
-// use embedded_sdmmc::BlockDevice;
 
 use cortex_m_semihosting as sh;
 
@@ -19,12 +18,15 @@ mod util;
 struct CS;
 struct SPI;
 
-impl hal::digital::OutputPin for CS {
-    fn set_low(&mut self) {
+impl hal::digital::v2::OutputPin for CS {
+    type Error = Infallible;
+    fn set_low(&mut self) -> Result<(), Infallible> {
         write!(GPIOA.bsrr: br15 = true);
+        Ok(())
     }
-    fn set_high(&mut self) {
+    fn set_high(&mut self) -> Result<(), Infallible> {
         write!(GPIOA.bsrr: bs15 = true);
+        Ok(())
     }
 }
 
@@ -94,7 +96,7 @@ fn main() -> ! {
     // Activate Standby mode on WFI
     pcore.SCB.set_sleepdeep();
     modif!(RCC.apb1enr: pwren = true);
-    modif!(PWR.csr: bre = true);  // note: BRE is actually EWUP2
+    modif!(PWR.csr: ewup2 = true);
     modif!(PWR.cr: cwuf = true, ulp = true, pdds = true);
 
     // Enable LED output
@@ -123,11 +125,11 @@ fn main() -> ! {
            en1 = true);
     write!(DAC.dhr8r1: dacc1dhr = 0);
 
-    write!(DMA1.cpar2: pa = 0x4000_7410);  // DHR 12bit
+    write!(DMA1.ch2.par: pa = 0x4000_7410);  // DHR 12bit
     write!(DMA1.cselr: c2s = 0b1001);
-    write!(DMA1.ccr2: circ = true, dir = true, minc = true, pl = 0b11, // very high
+    write!(DMA1.ch2.cr: circ = true, dir = true, minc = true, pl = 0b11, // very high
            msize = 0, psize = 0);
-    write!(DMA1.cndtr2: ndt = BUFSIZE as u16);
+    write!(DMA1.ch2.ndtr: ndt = BUFSIZE as u16);
 
     write!(TIM6.arr: arr = 180*4); // for 22050 kHz
     write!(TIM6.egr: ug = true);
@@ -141,18 +143,18 @@ fn main() -> ! {
 
     // Speed up SPI to maximum (8 MHz)
     modif!(SPI1.cr1: br = 0b000);
-    let vol = cont.get_volume(sd::VolumeIdx(0)).unwrap();
-    let root = cont.open_root_dir(&vol).unwrap();
+    let mut vol = cont.get_volume(sd::VolumeIdx(0)).unwrap();
+    let root = cont.open_root_dir(&mut vol).unwrap();
 
     let cfg = unsafe { &mut CONFIG };
-    let mut fd = cont.open_file_in_dir(&vol, &root, "config.txt", sd::Mode::ReadOnly).unwrap();
+    let mut fd = cont.open_file_in_dir(&mut vol, &root, "config.txt", sd::Mode::ReadOnly).unwrap();
     let n = cont.read(&vol, &mut fd, cfg).unwrap();
     let afile = core::str::from_utf8(&cfg[..n]).unwrap().trim();
     drop(fd);
 
-    let mut fd = cont.open_file_in_dir(&vol, &root, afile, sd::Mode::ReadOnly).unwrap();
+    let mut fd = cont.open_file_in_dir(&mut vol, &root, afile, sd::Mode::ReadOnly).unwrap();
 
-    'outer: loop {
+    loop {
         // Clear output
         write!(DAC.dhr8r1: dacc1dhr = 0);
 
@@ -162,14 +164,14 @@ fn main() -> ! {
         // Read first block into first buffer
         fd.seek_from_start(0).unwrap();
         cont.read(&vol, &mut fd, ptr1).unwrap();
-        write!(DMA1.cmar2: ma = ptr1.as_ptr() as u32);
+        write!(DMA1.ch2.mar: ma = ptr1.as_ptr() as u32);
 
         // Wait for button press
         while readb!(GPIOC.idr: id13) {}
 
         // Start DMA and timer
         write!(TIM6.cr1: cen = true);
-        modif!(DMA1.ccr2: en = true);
+        modif!(DMA1.ch2.cr: en = true);
 
         loop {
             swap(&mut ptr1, &mut ptr2);
@@ -177,13 +179,13 @@ fn main() -> ! {
             if cont.read(&vol, &mut fd, ptr1).unwrap() == 0 {
                 // On end of file, deactivate DMA
                 write!(TIM6.cr1: cen = false);
-                modif!(DMA1.ccr2: en = false);
+                modif!(DMA1.ch2.cr: en = false);
                 break;
             }
 
             // Wait for transfer complete flag
             while !readb!(DMA1.isr: tcif2) {}
-            write!(DMA1.cmar2: ma = ptr1.as_ptr() as u32);
+            write!(DMA1.ch2.mar: ma = ptr1.as_ptr() as u32);
             // Clear DMA transfer flags
             write!(DMA1.ifcr: ctcif2 = true, chtif2 = true, cgif2 = true, cteif2 = true);
         }
